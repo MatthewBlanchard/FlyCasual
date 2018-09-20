@@ -13,12 +13,14 @@ namespace Ship
             {
                 PilotName = "Viktor Hel";
                 PilotSkill = 4;
-                Cost = 43;
+                Cost = 45;
 
                 IsUnique = true;
 
                 PilotRuleType = typeof(SecondEdition);
                 PilotAbilities.Add(new Abilities.SecondEdition.ViktorHelAbilitySE());
+
+                SEImageNumber = 193;
             }
 
             public void AdaptPilotToSecondEdition()

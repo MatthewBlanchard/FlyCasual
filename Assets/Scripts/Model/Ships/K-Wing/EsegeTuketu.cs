@@ -15,13 +15,15 @@ namespace Ship
             public EsegeTuketu() : base()
             {
                 PilotName = "Esege Tuketu";
-                PilotSkill = 8;
+                PilotSkill = 3;
                 Cost = 50;
 
                 IsUnique = true;
 
                 PilotRuleType = typeof(SecondEdition);
                 PilotAbilities.Add(new EsegeTuketuAbilitySE());
+
+                SEImageNumber = 63;
             }
 
             public void AdaptPilotToSecondEdition()

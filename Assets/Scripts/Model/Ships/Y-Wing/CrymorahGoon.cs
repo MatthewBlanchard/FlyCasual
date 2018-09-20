@@ -15,13 +15,13 @@ namespace Ship
                 PilotSkill = 1;
                 Cost = 32;
 
-                PrintedUpgradeIcons.Add(Upgrade.UpgradeType.Astromech);
-
                 faction = Faction.Scum;
 
                 SkinName = "Brown";
 
                 PilotRuleType = typeof(SecondEdition);
+
+                SEImageNumber = 168;
             }
 
             public void AdaptPilotToSecondEdition()

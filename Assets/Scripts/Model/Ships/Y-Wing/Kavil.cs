@@ -1,4 +1,5 @@
-﻿using RuleSets;
+﻿using Arcs;
+using RuleSets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,8 @@ namespace Ship
             {
                 PilotSkill = 5;
                 Cost = 42;
+
+                SEImageNumber = 165;
             }
         }
     }
@@ -53,11 +56,10 @@ namespace Abilities
 
         private void KavilPilotAbility(ref int diceCount)
         {
-            if (!Combat.ShotInfo.InArc)
+            if (!BoardTools.Board.IsShipInArcByType(HostShip, Combat.Defender, ArcTypes.Primary))
             {
                 diceCount++;
             }
         }
-
     }
 }

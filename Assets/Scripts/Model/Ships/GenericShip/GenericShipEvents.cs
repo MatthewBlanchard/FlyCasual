@@ -12,6 +12,7 @@ namespace Ship
         public delegate void EventHandler();
         public delegate void EventHandlerInt(ref int data);
         public delegate void EventHandlerBool(ref bool data);
+        public delegate void EventHandlerBoolDirection(ref bool data, Direction direction);
         public delegate void EventHandlerAction(ActionsList.GenericAction action);
         public delegate void EventHandlerActionBool(ActionsList.GenericAction action, ref bool data);
         public delegate void EventHandlerActionInt(ActionsList.GenericAction action, ref int priority);
@@ -19,6 +20,7 @@ namespace Ship
         public delegate void EventHandlerShip(GenericShip ship);
         public delegate void EventHandlerShipDamage(GenericShip ship, DamageSourceEventArgs e);
         public delegate void EventHandlerShipBool(GenericShip ship, bool flag);
+        public delegate void EventHandlerShipRefBool(GenericShip ship, ref bool flag);
         public delegate void EventHandler2Ships(ref bool result, GenericShip attacker, GenericShip defender);
         public delegate void EventHandlerShipType(GenericShip ship, System.Type type);
         public delegate void EventHandlerShipTypeBool(GenericShip ship, System.Type type, ref bool data);
@@ -34,6 +36,7 @@ namespace Ship
         public delegate void EventHandlerObjArgsBool(object sender, EventArgs e, ref bool isChanged);
         public delegate void EventHandlerUpgrade(GenericUpgrade upgrade);
         public delegate void EventHandlerDualUpgrade(GenericDualUpgrade upgrade);
+        public delegate void EventHandelerWeaponRange(GenericSecondaryWeapon weapon, ref int minRange, ref int maxRange);
 
         public event EventHandlerShip AfterStatsAreChanged;
         public event EventHandlerInt AfterGetMaxHull;

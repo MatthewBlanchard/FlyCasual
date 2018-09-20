@@ -59,7 +59,7 @@ namespace Ship
             }
         }
         
-        public string PilotName { get; protected set; }
+        public string PilotName { get; set; }
         public string PilotNameShort { get; protected set; }
         public bool IsUnique { get; protected set; }
 
@@ -145,7 +145,7 @@ namespace Ship
             }
         }
 
-        public int MaxForce { get; protected set; }
+        public int MaxForce { get; set; }
 
         protected List<IModifyPilotSkill> PilotSkillModifiers;
 
@@ -166,7 +166,7 @@ namespace Ship
                 result = Mathf.Clamp(result, 0, 12);
                 return result;
             }
-            protected set
+            set
             {
                 value = Mathf.Clamp(value, 0, 12);
                 pilotSkill = value;

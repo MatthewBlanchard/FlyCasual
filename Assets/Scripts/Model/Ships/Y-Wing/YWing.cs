@@ -91,10 +91,12 @@ namespace Ship
 
                 PrintedUpgradeIcons.Add(Upgrade.UpgradeType.Bomb);
                 PrintedUpgradeIcons.Add(Upgrade.UpgradeType.Gunner);
+                PrintedUpgradeIcons.Add(Upgrade.UpgradeType.Astromech);
                 PrintedUpgradeIcons.Remove(Upgrade.UpgradeType.Torpedo);
+                PrintedUpgradeIcons.Remove(Upgrade.UpgradeType.SalvagedAstromech);
 
                 IconicPilots[Faction.Scum] = typeof(NorraWexleyYWing);
-                IconicPilots[Faction.Scum] = typeof(HiredGun);
+                IconicPilots[Faction.Scum] = typeof(DreaRenthal);
             }
 
         }

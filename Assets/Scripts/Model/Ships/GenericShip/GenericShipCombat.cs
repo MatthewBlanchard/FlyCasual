@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Upgrade;
 
 namespace Ship
 {
@@ -103,8 +104,11 @@ namespace Ship
         public bool CanAttackBumpedTargetAlways { get; set; }
         public bool IgnoressBombDetonationEffect { get; set; }
         public bool AttackIsAlwaysConsideredHit { get; set; }
+        public bool CanBonusAttack { get; set; }
 
         // EVENTS
+
+        public event EventHandlerShip OnSystemsPhaseStart;
 
         public event EventHandlerShip OnActivationPhaseStart;
         public event EventHandlerShip OnActionSubPhaseStart;
@@ -162,6 +166,7 @@ namespace Ship
 
         public event EventHandlerShip OnDamageWasSuccessfullyDealt;
         public event EventHandlerShip OnDamageCardIsDealt;
+        public static event EventHandlerShipDamage OnDamageInstanceResolvedGlobal;
 
         public event EventHandlerShip OnReadyToBeDestroyed;
         public event EventHandlerShipBool OnShipIsDestroyed;
@@ -186,6 +191,8 @@ namespace Ship
         public event EventHandler2Ships OnCanAttackBumpedTarget;
         public static event EventHandler2Ships OnCanAttackBumpedTargetGlobal;
 
+        public static event EventHandlerShipRefBool OnCanAttackWhileLandedOnObstacleGlobal;
+
         public event EventHandlerShip OnCombatActivation;
         public static event EventHandlerShip OnCombatActivationGlobal;
         public event EventHandlerShip OnCombatDeactivation;
@@ -199,14 +206,25 @@ namespace Ship
         public event EventHandlerBool OnTryConfirmDiceResults;
 
         public event EventHandlerShip OnCombatCompareResults;
+        public event EventHandler OnAfterNeutralizeResults;
 
         public event EventHandler AfterAttackDiceModification;
+
+        public event EventHandler OnBombWasDropped;
+        public event EventHandler OnBombWasLaunched;
+
+        public event EventHandelerWeaponRange OnUpdateWeaponRange;
 
         // TRIGGERS
 
         public void CallOnActivationPhaseStart()
         {
             if (OnActivationPhaseStart != null) OnActivationPhaseStart(this);
+        }
+
+        public void CallOnSystemsPhaseStart()
+        {
+            if (OnSystemsPhaseStart != null) OnSystemsPhaseStart(this);
         }
 
         public void CallOnRoundEnd()
@@ -345,6 +363,10 @@ namespace Ship
         public void CallAttackFinish()
         {
             if (OnAttackFinish != null) OnAttackFinish(this);
+        }
+
+        public void CallAttackFinishGlobal()
+        {
             if (OnAttackFinishGlobal != null) OnAttackFinishGlobal(this);
         }
 
@@ -387,6 +409,13 @@ namespace Ship
             if (OnDamageCardIsDealt != null) OnDamageCardIsDealt(this);
 
             Triggers.ResolveTriggers(TriggerTypes.OnDamageCardIsDealt, callBack);
+        }
+
+        public void CallOnDamageInstanceResolved(DamageSourceEventArgs dsource, Action callback)
+        {
+            if (OnDamageInstanceResolvedGlobal != null) OnDamageInstanceResolvedGlobal(this, dsource);
+
+            Triggers.ResolveTriggers(TriggerTypes.OnDamageInstanceResolved, callback);
         }
 
         public void CallOnShieldIsLost(Action callback)
@@ -535,6 +564,7 @@ namespace Ship
         public void ProcessDrawnDamageCard(EventArgs e)
         {
             AssignedDamageDiceroll.CancelHits(1);
+            AssignedDamageDiceroll.RemoveAllFailures();
 
             if (Combat.CurrentCriticalHitCard.IsFaceup)
             {
@@ -601,6 +631,7 @@ namespace Ship
         public void SufferShieldDamage()
         {
             AssignedDamageDiceroll.CancelHits(1);
+            AssignedDamageDiceroll.RemoveAllFailures();
 
             Shields--;
             CallAfterAssignedDamageIsChanged();
@@ -851,6 +882,15 @@ namespace Ship
             return result;
         }
 
+        public bool CanAttackWhileLandedOnObstacle()
+        {
+            bool result = false;
+
+            if (OnCanAttackWhileLandedOnObstacleGlobal != null) OnCanAttackWhileLandedOnObstacleGlobal(this, ref result);
+
+            return result;
+        }
+
         public List<IShipWeapon> GetAllWeapons()
         {
             List<IShipWeapon> allWeapons = new List<IShipWeapon>
@@ -889,6 +929,52 @@ namespace Ship
             if (OnCombatCompareResults != null) OnCombatCompareResults(this);
         }
 
+        public void CallAfterNeutralizeResults(Action callback)
+        {
+            if (OnAfterNeutralizeResults != null) OnAfterNeutralizeResults();
+
+            Triggers.ResolveTriggers(TriggerTypes.OnAfterNeutralizeResults, callback);
+        }
+
+        public void StartBonusAttack(Action callback)
+        {
+            if(!CanBonusAttack)
+            {
+                // We should never reach this but just in case.
+                Messages.ShowError(PilotName + ": You have already performed a bonus attack!");
+                return;
+            }
+
+            CanBonusAttack = false;
+
+			Combat.StartAdditionalAttack(
+				this,
+				callback,
+				null,
+				PilotName,
+				"You may perform a primary weapon attack.",
+				ImageUrl
+			);
+        }
+
+        public void CallBombWasDropped(Action callback)
+        {
+            if (OnBombWasDropped != null) OnBombWasDropped();
+
+            Triggers.ResolveTriggers(TriggerTypes.OnBombWasDropped, callback);
+        }
+
+        public void CallBombWasLaunched(Action callback)
+        {
+            if (OnBombWasLaunched != null) OnBombWasLaunched();
+
+            Triggers.ResolveTriggers(TriggerTypes.OnBombWasLaunched, callback);
+        }
+
+        public void CallUpdateWeaponRange(GenericSecondaryWeapon weapon, ref int minRange, ref int maxRange)
+        {
+            if (OnUpdateWeaponRange != null) OnUpdateWeaponRange(weapon, ref minRange, ref maxRange);
+        }
     }
 
 }

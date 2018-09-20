@@ -39,8 +39,7 @@ namespace Players
                     int direction = (Phases.CurrentSubPhase.RequiredPlayer == PlayerNo.Player1) ? -1 : 1;
                     Vector3 position = shipHolder.Value.GetPosition() - direction * new Vector3(0, 0, Board.BoardIntoWorld(Board.DISTANCE_1 + Board.RANGE_1));
 
-                    GameManagerScript Game = GameObject.Find("GameManager").GetComponent<GameManagerScript>();
-                    Game.Wait(
+                    GameManagerScript.Wait(
                         0.5f,
                         delegate {
                             GameCommand command = SetupSubPhase.GeneratePlaceShipCommand(shipHolder.Value.ShipId, position, shipHolder.Value.GetAngles());
@@ -121,10 +120,11 @@ namespace Players
                 GenericShip targetForAttack = SelectTargetForAttack();
 
                 Selection.ThisShip.CallAfterAttackWindow();
-                Selection.ThisShip.IsAttackPerformed = true;
 
                 if (targetForAttack != null)
                 {
+                    Selection.ThisShip.IsAttackPerformed = true;
+
                     Console.Write("Ship attacks target\n", LogTypes.AI, true, "yellow");
 
                     GameCommand command = Combat.GenerateIntentToAttackCommand(Selection.ThisShip.ShipId, targetForAttack.ShipId, true);
@@ -244,6 +244,7 @@ namespace Players
 
             if (Selection.ThisShip != null)
             {
+                ReplaysManager.RecordCommand(CombatSubPhase.GenerateCombatActicationCommand(Selection.ThisShip.ShipId));
                 Selection.ThisShip.CallCombatActivation(callback);
             }
             else
@@ -366,8 +367,6 @@ namespace Players
         {
             base.UseDiceModifications(type);
 
-            Combat.ShowDiceModificationButtons(type);
-
             Action FinalEffect = null;
             switch (type)
             {
@@ -450,15 +449,18 @@ namespace Players
 
         public override void OnTargetNotLegalForAttack()
         {
-            Selection.ThisShip.CallAfterAttackWindow();
+            /*Selection.ThisShip.CallAfterAttackWindow();
             Selection.ThisShip.IsAttackPerformed = true;
             Selection.ThisShip.CallCombatDeactivation(
                 delegate { Phases.FinishSubPhase(typeof(CombatSubPhase)); }
-            );
+            );*/
+
+            GameMode.CurrentGameMode.ExecuteCommand(UI.GenerateSkipButtonCommand());
         }
 
         public override void ChangeManeuver(Action<string> callback, Func<string, bool> filter = null)
         {
+            Phases.CurrentSubPhase.IsReadyForCommands = true;
             callback(Selection.ThisShip.AssignedManeuver.ToString());
         }
 
@@ -501,6 +503,8 @@ namespace Players
 
         public override void SelectShipForAbility()
         {
+            base.SelectShipForAbility();
+
             (Phases.CurrentSubPhase as SelectShipSubPhase).AiSelectPrioritizedTarget();
         }
 
@@ -520,8 +524,7 @@ namespace Players
             }
             else
             {
-                GameManagerScript Game = GameObject.Find("GameManager").GetComponent<GameManagerScript>();
-                Game.Wait(1, delegate
+                GameManagerScript.Wait(1, delegate
                 {
                     (Phases.CurrentSubPhase as ObstaclesPlacementSubPhase).PlaceRandom();
                     Messages.ShowInfo("AI: Obstacle was placed");
@@ -532,8 +535,21 @@ namespace Players
         public override void PerformSystemsActivation()
         {
             base.PerformSystemsActivation();
-            UI.SkipButtonEffect();
+            UI.CallClickSkipPhase();
         }
 
+        public override void InformAboutCrit()
+        {
+            base.InformAboutCrit();
+
+            GameManagerScript.Wait(3, InformCrit.ButtonConfirm);
+        }
+
+        public override void SyncDiceResults()
+        {
+            base.SyncDiceResults();
+
+            GameMode.CurrentGameMode.ExecuteCommand(DiceRoll.GenerateSyncDiceCommand());
+        }
     }
 }

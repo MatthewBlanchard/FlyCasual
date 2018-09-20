@@ -4,6 +4,8 @@ using UnityEngine;
 
 public static class DebugManager
 {
+    public static bool ReleaseVersion = false;
+
     public static bool FullDebug;
 
     public static bool DebugTemporary;
@@ -13,6 +15,12 @@ public static class DebugManager
     public static bool DebugNoSquadPointsLimit;
 
     public static bool DebugNoCombat;
+
+    public static bool NoAsteroidSetup;
+
+    public static bool NoReplayCreation;
+
+    public static bool DebugMovement;
 
     private static bool debugNetwork = true;
     public static bool DebugNetwork
@@ -46,17 +54,6 @@ public static class DebugManager
         set { debugAI = value; }
     }
 
-    private static bool debugBoard;
-    public static bool DebugBoard
-    {
-        get
-        {
-            if (FullDebug) return true;
-            return debugBoard;
-        }
-        set { debugBoard = value; }
-    }
-
     private static bool debugDamage;
     public static bool DebugDamage
     {
@@ -66,28 +63,6 @@ public static class DebugManager
             return debugDamage;
         }
         set { debugDamage = value; }
-    }
-
-    private static bool debugArcsAndDistance;
-    public static bool DebugArcsAndDistance
-    {
-        get
-        {
-            if (FullDebug) return true;
-            return debugArcsAndDistance;
-        }
-        set { debugArcsAndDistance = value; }
-    }
-
-    private static bool debugMovement;
-    public static bool DebugMovement
-    {
-        get
-        {
-            if (FullDebug) return true;
-            return debugMovement;
-        }
-        set { debugMovement = value; }
     }
 
 }
